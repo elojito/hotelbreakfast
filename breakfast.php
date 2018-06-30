@@ -73,15 +73,20 @@ if(isset($field_cold) OR isset($field_hot)){
 }
 if($field_sucre !== 0){
 	$field_message.= "\n"."sucre: ".$_POST["sucre"];
-}    
-$mail_to = "hellojito@gmail.com";
+} 
 
-$subject = "Commande envoyée par ".$field_name."\n".$field_room;
+require 'PHPMailer/class.phpmailer.php';
+$mail           = new PHPMailer();
+//$mail->From     = ;
+$mail->FromName = $field_name."\n".$field_room;
+$mail->Subject  = 'Commande petit déjeuner, chambre '.$field_room;
+$mail->MsgHTML($field_message."\n");
+$mail->AltBody = "Message HTML, votre messagerie n'accepte pas ce format";
+$mail->CharSet = 'UTF-8';
+$mail->AddAddress("hellojito@gmail.com", "Elodie Ollivier");
+$mail->Send();
 
-$body_message = $field_message."\n";
-
-$mail_status = mail($mail_to, $subject, $body_message);
-if ($mail_status){ ?>
+if ($mail->Send()) { ?>
  <script language="javascript" type="text/javascript">
     alert("La commande a bien été envoyée");
     window.location = "index.php";
@@ -90,7 +95,8 @@ if ($mail_status){ ?>
 }
 else {?>
 <script language="javascript" type="text/javascript">
-    alert("La commande n'a pas été envoyée. Merci d'envoyer un message à hellojito@gmail.com");
+    alert("La commande n'a pas été envoyée. \n");
+    <?php  echo $mail->ErrorInfo; ?>
     window.location = "index.php";
 </script>
 <?php
